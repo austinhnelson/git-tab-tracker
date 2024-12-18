@@ -9,16 +9,9 @@
   "categories": [
     "Other"
   ],
-  "activationEvents": [],
+  "activationEvents": [ "onStartupFinished" ],
   "main": "./out/extension.js",
-  "contributes": {
-    "commands": [
-      {
-        "command": "git-tab-tracker.getCurrentBranch",
-        "title": "Get Current Branch"
-      }
-    ]
-  },
+  "contributes": {},
   "scripts": {
     "vscode:prepublish": "npm run compile",
     "compile": "tsc -p ./",
@@ -38,7 +31,7 @@
     "eslint": "^8.57.0",
     "typescript": "^5.4.5"
   },
-  "dependencies": {
-    "simple-git": "^3.26.0"
-  }
+  "extensionDependencies": [
+      "vscode.git"
+  ]
 }

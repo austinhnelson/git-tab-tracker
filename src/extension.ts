@@ -63,10 +63,6 @@ async function persistTabs(context: vscode.ExtensionContext, branch: string) {
   branchTabs[branch] = openTabs;
 
   await context.workspaceState.update("branchTabs", branchTabs);
-
-  vscode.window.showInformationMessage(
-    `Saved ${openTabs.length} tabs for branch: ${branch}`
-  );
 }
 
 async function getPersistedTabs(
@@ -89,6 +85,9 @@ async function getPersistedTabs(
 async function openTabs(context: vscode.ExtensionContext, branch: string) {
   const tabs = await getPersistedTabs(context, branch);
 
+  if (!tabs || tabs.length === 0) {
+    return;
+  }
   await vscode.commands.executeCommand("workbench.action.closeAllEditors");
 
   for (const tabUri of tabs) {

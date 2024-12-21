@@ -11,7 +11,18 @@
   ],
   "activationEvents": [ "onStartupFinished" ],
   "main": "./out/extension.js",
-  "contributes": {},
+  "contributes": {
+    "configuration": {
+      "title": "Git Branch Tab Tracker",
+      "properties": {
+        "tabTracker.bringTabsOnNoSavedAssociation": {
+          "type": "boolean",
+          "default": false,
+          "description": "Automatically carry over open tabs to a new branch if no existing tab association is found for the branch being checked out."
+        }
+      }
+    }
+  },
   "scripts": {
     "vscode:prepublish": "npm run compile",
     "compile": "tsc -p ./",

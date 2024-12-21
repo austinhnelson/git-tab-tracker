@@ -24,7 +24,37 @@ export function activate(context: vscode.ExtensionContext) {
 
       if (currentBranch && currentBranch !== newBranch) {
         await persistTabs(context, currentBranch);
-        await openTabs(context, newBranch);
+
+        let bringTabs = true;
+        const tabs = await getPersistedTabs(context, newBranch);
+        if (!tabs || tabs.length === 0) {
+          const config = vscode.workspace.getConfiguration("myExtension");
+          const showBringTabsInfoBox = config.get<boolean>(
+            "bringTabsOnNoSavedAssociation",
+            true
+          );
+
+          if (showBringTabsInfoBox) {
+            const selection = await vscode.window.showInformationMessage(
+              "No saved tabs for the branch checked out, bring tabs with you? This setting can be configured in settings.",
+              "Yes",
+              "No"
+            );
+
+            if (selection === "Yes") {
+              bringTabs = true;
+            } else {
+              await vscode.commands.executeCommand(
+                "workbench.action.closeAllEditors"
+              );
+              bringTabs = false;
+            }
+          }
+        }
+
+        if (bringTabs) {
+          await openTabs(context, newBranch);
+        }
       }
 
       currentBranch = newBranch;

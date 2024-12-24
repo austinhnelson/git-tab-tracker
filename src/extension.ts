@@ -1,58 +1,84 @@
 import * as vscode from "vscode";
+import i18next from "i18next";
+
+i18next.init({
+  lng: "en",
+  debug: true,
+  resources: {
+    en: {
+      translation: {
+        yes: "Yes",
+        no: "No",
+        error: {
+          apiNotFound: "Git API not found.",
+        },
+        information: {
+          noSavedTabs:
+            "No saved tabs for the branch checked out, bring tabs with you? This setting can be configured in settings.",
+        },
+      },
+    },
+  },
+});
 
 /**
  * This function gets called when the extension is activated.
  *
  * @param context - Context provided by VS Code.
  */
-export function activate(context: vscode.ExtensionContext) {
-  const gitExtension = vscode.extensions.getExtension("vscode.git")?.exports;
-  const api = gitExtension?.getAPI(1);
+export const activate = (context: vscode.ExtensionContext) => {
+  const gitApi = getApi();
 
-  if (!api) {
-    vscode.window.showErrorMessage("Git API not found!");
+  if (!gitApi) {
+    vscode.window.showErrorMessage(i18next.t("error.apiNotFound"));
     return;
   }
 
-  let currentBranch: string | undefined;
+  const attachListeners = (repo: any) => {
+    context.subscriptions.push(repo.state.onDidChange(() => trackTabs(repo)));
+  };
 
   const trackTabs = async (repo: any) => {
-    const head = repo.state.HEAD;
+    const newBranch = repo.state.HEAD.name;
 
-    if (head) {
-      const newBranch = head.name;
-
+    if (newBranch) {
       if (currentBranch && currentBranch !== newBranch) {
         await persistTabs(context, currentBranch);
 
-        let bringTabs = true;
+        const config = vscode.workspace.getConfiguration("tabTracker");
+
+        let shouldBringTabs = config.get<boolean>(
+          "bringTabsOnNoSavedAssociation"
+        );
         const tabs = await getPersistedTabs(context, newBranch);
-        if (!tabs || tabs.length === 0) {
-          const config = vscode.workspace.getConfiguration("myExtension");
-          const showBringTabsInfoBox = config.get<boolean>(
-            "bringTabsOnNoSavedAssociation",
-            true
+
+        if (tabs.length === 0) {
+          const shouldShowInfoBox = config.get<boolean>(
+            "showBoxOnNoSavedAssociation"
           );
 
-          if (showBringTabsInfoBox) {
+          if (shouldShowInfoBox) {
             const selection = await vscode.window.showInformationMessage(
-              "No saved tabs for the branch checked out, bring tabs with you? This setting can be configured in settings.",
-              "Yes",
-              "No"
+              i18next.t("information.noSavedTabs"),
+              i18next.t("yes"),
+              i18next.t("no")
             );
 
             if (selection === "Yes") {
-              bringTabs = true;
-            } else {
-              await vscode.commands.executeCommand(
-                "workbench.action.closeAllEditors"
-              );
-              bringTabs = false;
+              shouldBringTabs = true;
+            } else if (selection === "No") {
+              shouldBringTabs = false;
             }
           }
-        }
 
-        if (bringTabs) {
+          if (shouldBringTabs) {
+            await openTabs(context, newBranch);
+          } else {
+            await vscode.commands.executeCommand(
+              "workbench.action.closeAllEditors"
+            );
+          }
+        } else {
           await openTabs(context, newBranch);
         }
       }
@@ -61,26 +87,43 @@ export function activate(context: vscode.ExtensionContext) {
     }
   };
 
-  const attachListeners = (repo: any) => {
-    context.subscriptions.push(repo.state.onDidChange(() => trackTabs(repo)));
-  };
+  let currentBranch: string | undefined;
 
-  api.repositories.forEach((repo: any) => {
-    const head = repo.state.head;
-    currentBranch = head?.name;
+  const workspaceFolder = vscode.workspace.workspaceFolders?.[0];
+  const repo = workspaceFolder
+    ? gitApi.getRepository(workspaceFolder.uri)
+    : undefined;
 
-    attachListeners(repo);
-  });
+  if (repo) {
+    context.subscriptions.push(
+      repo.state.onDidChange(async () => await trackTabs(repo))
+    );
+    currentBranch = repo.state.head?.name;
+  }
 
-  context.subscriptions.push(api.onDidOpenRepository(attachListeners));
-}
+  context.subscriptions.push(
+    gitApi.onDidOpenRepository((newRepo: any) => {
+      if (newRepo.rootUri.fsPath === workspaceFolder?.uri.fsPath) {
+        attachListeners(newRepo);
+      }
+    })
+  );
+};
 
 /**
  * This function is called when the extension is deactivated.
  */
-export function deactivate() {}
+export const deactivate = () => {};
 
-async function persistTabs(context: vscode.ExtensionContext, branch: string) {
+const getApi = () => {
+  const gitExtension = vscode.extensions.getExtension("vscode.git")?.exports;
+  return gitExtension?.getAPI(1) || null;
+};
+
+const persistTabs = async (
+  context: vscode.ExtensionContext,
+  branch: string
+) => {
   const openTabs = vscode.window.tabGroups.all
     .flatMap((group) => group.tabs)
     .filter((tab) => tab.input && (tab.input as any).uri)
@@ -93,26 +136,9 @@ async function persistTabs(context: vscode.ExtensionContext, branch: string) {
   branchTabs[branch] = openTabs;
 
   await context.workspaceState.update("branchTabs", branchTabs);
-}
+};
 
-async function getPersistedTabs(
-  context: vscode.ExtensionContext,
-  branch: string
-) {
-  const branchTabs: Record<string, string[]> = context.workspaceState.get(
-    "branchTabs",
-    {}
-  );
-  const tabs = branchTabs[branch];
-
-  if (!tabs) {
-    return [];
-  }
-
-  return tabs;
-}
-
-async function openTabs(context: vscode.ExtensionContext, branch: string) {
+const openTabs = async (context: vscode.ExtensionContext, branch: string) => {
   const tabs = await getPersistedTabs(context, branch);
 
   if (!tabs || tabs.length === 0) {
@@ -128,4 +154,21 @@ async function openTabs(context: vscode.ExtensionContext, branch: string) {
       vscode.window.showErrorMessage(`Could not open file: ${uri.fsPath}`);
     }
   }
-}
+};
+
+const getPersistedTabs = async (
+  context: vscode.ExtensionContext,
+  branch: string
+) => {
+  const branchTabs: Record<string, string[]> = context.workspaceState.get(
+    "branchTabs",
+    {}
+  );
+  const tabs = branchTabs[branch];
+
+  if (!tabs) {
+    return [];
+  }
+
+  return tabs;
+};

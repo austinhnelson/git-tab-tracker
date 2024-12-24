@@ -9,7 +9,9 @@
   "categories": [
     "Other"
   ],
-  "activationEvents": [ "onStartupFinished" ],
+  "activationEvents": [
+    "onStartupFinished"
+  ],
   "main": "./out/extension.js",
   "contributes": {
     "configuration": {
@@ -17,8 +19,13 @@
       "properties": {
         "tabTracker.bringTabsOnNoSavedAssociation": {
           "type": "boolean",
-          "default": false,
+          "default": true,
           "description": "Automatically carry over open tabs to a new branch if no existing tab association is found for the branch being checked out."
+        },
+        "tabTracker.showBoxOnNoSavedAssociation": {
+          "type": "boolean",
+          "default": true,
+          "description": "Show information box when new branch has no saved associations."
         }
       }
     }
@@ -43,6 +50,9 @@
     "typescript": "^5.4.5"
   },
   "extensionDependencies": [
-      "vscode.git"
-  ]
+    "vscode.git"
+  ],
+  "dependencies": {
+    "i18next": "^24.2.0"
+  }
 }

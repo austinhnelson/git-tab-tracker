@@ -2,6 +2,11 @@
   "name": "git-tab-tracker",
   "displayName": "git-tab-tracker",
   "description": "",
+  "publisher": "austinnelson",
+  "repository": {
+  "type": "git",
+  "url": "git://github.com/austinhnelson/git-tab-tracker.git"
+  },
   "version": "0.0.1",
   "engines": {
     "vscode": "^1.92.0"

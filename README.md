@@ -1,14 +1,24 @@
-# git-tab-tracker README
+# Git Branch Tabs
 
-Tracks the last opened tabs on a git branch and will reopen tabs upon switching to a previously checked out branch.
+## About
 
-## Extension Settings
+Tracks open tabs for each Git branch and restores them when switching branches.
+![Git Branch Tabs demo](assets/images/demo.gif)
 
-* `myExtension.bringTabsOnNoSavedAssociation`: Whether to bring currently open tabs to a new branch (or one without saved tabs).
-* `myExtension.showBoxOnNoSavedAssociation`: Whether to show a dialog prompting there are no saved tabs on branch checked out.
+
+Prompts you when no saved tab associations are found for a branch.
+![Git Branch Tabs no saved associations demo](/assets/images/no-saved-associations-demo.gif)
+
+## Settings
+
+![Git Branch Tabs settings](assets/images/settings.png)
 
 ## Release Notes
 
-### 1.0.0
+### 0.0.1
 
 Initial release of git tab tracker.
+
+## 0.0.2
+
+Update README, package name, package description, and settings.

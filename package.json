@@ -1,12 +1,13 @@
 {
   "name": "git-tab-tracker",
-  "displayName": "git-tab-tracker",
-  "description": "",
-  "publisher": "austinnelson",
+  "displayName": "Git Branch Tabs",
+  "description": "Track open tabs per Git branch.",
+  "publisher": "austinhnelson",
   "repository": {
   "type": "git",
   "url": "git://github.com/austinhnelson/git-tab-tracker.git"
   },
+  "icon": "assets/images/icon.png",
   "version": "0.0.1",
   "engines": {
     "vscode": "^1.92.0"
@@ -20,17 +21,17 @@
   "main": "./out/extension.js",
   "contributes": {
     "configuration": {
-      "title": "Git Branch Tab Tracker",
+      "title": "Git Branch Tabs",
       "properties": {
-        "tabTracker.bringTabsOnNoSavedAssociation": {
+        "tabTracker.bringOpenTabsWhenNoSavedAssociations": {
           "type": "boolean",
           "default": true,
-          "description": "Automatically carry over open tabs to a new branch if no existing tab association is found for the branch being checked out."
+          "description": "Automatically bring open tabs when checking out a branch with no saved associations."
         },
-        "tabTracker.showBoxOnNoSavedAssociation": {
+        "tabTracker.displayInfoBoxWhenNoSavedAssociations": {
           "type": "boolean",
           "default": true,
-          "description": "Show information box when new branch has no saved associations."
+          "description": "Display info box when checking out a branch with no saved associations."
         }
       }
     }

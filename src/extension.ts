@@ -48,13 +48,13 @@ export const activate = (context: vscode.ExtensionContext) => {
         const config = vscode.workspace.getConfiguration("tabTracker");
 
         let shouldBringTabs = config.get<boolean>(
-          "bringTabsOnNoSavedAssociation"
+          "bringOpenTabsWhenNoSavedAssociations"
         );
         const tabs = await getPersistedTabs(context, newBranch);
 
         if (tabs.length === 0) {
           const shouldShowInfoBox = config.get<boolean>(
-            "showBoxOnNoSavedAssociation"
+            "displayInfoBoxWhenNoSavedAssociations"
           );
 
           if (shouldShowInfoBox) {

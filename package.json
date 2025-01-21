@@ -8,7 +8,7 @@
   "url": "git://github.com/austinhnelson/git-tab-tracker.git"
   },
   "icon": "assets/images/icon.png",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "engines": {
     "vscode": "^1.92.0"
   },

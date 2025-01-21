@@ -7,4 +7,5 @@ All notable changes to the "git-tab-tracker" extension will be documented in thi
 ### Added
 
 - v0.1 Initial release
-- v0.2 Fix documentation
+- v0.2 Update documentation
+- v0.3 Fix documentation

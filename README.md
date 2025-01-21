@@ -22,3 +22,7 @@ Initial release of git tab tracker.
 ## 0.0.2
 
 Update README, package name, package description, and settings.
+
+## 0.0.3 
+
+Update docs.

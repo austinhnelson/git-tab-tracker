@@ -7,7 +7,7 @@ Tracks open tabs for each Git branch and restores them when switching branches.
 
 
 Prompts you when no saved tab associations are found for a branch.
-![Git Branch Tabs no saved associations demo](/assets/images/no-saved-associations-demo.gif)
+![Git Branch Tabs no saved associations demo](/assets/images/no-saved-tabs-demo.gif)
 
 ## Settings
 

@@ -2,13 +2,13 @@
   "name": "git-tab-tracker",
   "displayName": "Git Branch Tabs",
   "description": "Track open tabs per Git branch.",
-  "publisher": "austinhnelson",
+  "publisher": "austinnelson",
   "repository": {
   "type": "git",
   "url": "git://github.com/austinhnelson/git-tab-tracker.git"
   },
   "icon": "assets/images/icon.png",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "engines": {
     "vscode": "^1.92.0"
   },

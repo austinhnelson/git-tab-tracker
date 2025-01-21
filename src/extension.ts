@@ -124,15 +124,18 @@ const persistTabs = async (
   context: vscode.ExtensionContext,
   branch: string
 ) => {
-  const openTabs = vscode.window.tabGroups.all
-    .flatMap((group) => group.tabs)
-    .filter((tab) => tab.input && (tab.input as any).uri)
-    .map((tab) => (tab.input as any).uri.toString());
+  const openTabs = vscode.window.tabGroups.all.flatMap((group, groupIndex) =>
+    group.tabs.map((tab) => ({
+      uri: (tab.input as any).uri.toString(),
+      groupIndex,
+    }))
+  );
 
-  const branchTabs: Record<string, string[]> = context.workspaceState.get(
+  const branchTabs: Record<string, any[]> = context.workspaceState.get(
     "branchTabs",
     {}
   );
+
   branchTabs[branch] = openTabs;
 
   await context.workspaceState.update("branchTabs", branchTabs);
@@ -146,10 +149,18 @@ const openTabs = async (context: vscode.ExtensionContext, branch: string) => {
   }
   await vscode.commands.executeCommand("workbench.action.closeAllEditors");
 
-  for (const tabUri of tabs) {
-    const uri = vscode.Uri.parse(tabUri);
+  for (const tab of tabs) {
+    if (!tab.uri) {
+      continue;
+    }
+
+    const uri = vscode.Uri.parse(tab.uri);
+
     try {
-      await vscode.window.showTextDocument(uri, { preview: false });
+      await vscode.window.showTextDocument(uri, {
+        preview: false,
+        viewColumn: tab.groupIndex + 1,
+      });
     } catch (err) {
       vscode.window.showErrorMessage(`Could not open file: ${uri.fsPath}`);
     }
@@ -160,15 +171,10 @@ const getPersistedTabs = async (
   context: vscode.ExtensionContext,
   branch: string
 ) => {
-  const branchTabs: Record<string, string[]> = context.workspaceState.get(
+  const branchTabs: Record<string, any[]> = context.workspaceState.get(
     "branchTabs",
     {}
   );
-  const tabs = branchTabs[branch];
 
-  if (!tabs) {
-    return [];
-  }
-
-  return tabs;
+  return branchTabs[branch] || [];
 };

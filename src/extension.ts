@@ -35,7 +35,17 @@ export const activate = (context: vscode.ExtensionContext) => {
   }
 
   const attachListeners = (repo: any) => {
-    context.subscriptions.push(repo.state.onDidChange(() => trackTabs(repo)));
+    context.subscriptions.push(
+      repo.state.onDidChange(async () => await trackTabs(repo))
+    );
+
+    context.subscriptions.push(
+      repo.state.onDidChange(async () => await deleteBranch(repo))
+    );
+  };
+
+  const deleteBranch = async (repo: any) => {
+    await vscode.window.showInformationMessage("test");
   };
 
   const trackTabs = async (repo: any) => {
@@ -95,9 +105,7 @@ export const activate = (context: vscode.ExtensionContext) => {
     : undefined;
 
   if (repo) {
-    context.subscriptions.push(
-      repo.state.onDidChange(async () => await trackTabs(repo))
-    );
+    attachListeners(repo);
     currentBranch = repo.state.head?.name;
   }
 
